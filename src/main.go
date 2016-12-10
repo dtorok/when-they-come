@@ -9,11 +9,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"healthcheck"
+	"api"
+	"web"
 )
 
 func main() {
-	http.HandleFunc("/", handle)
-	http.HandleFunc("/_ah/health", healthCheckHandler)
+	//http.HandleFunc("/", handle)
+	http.HandleFunc("/_ah/health", healthcheck.HealthCheckHandler)
+
+	api.AddHandlers()
+	web.AddHandlers()
+
 	log.Print("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
