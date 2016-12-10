@@ -1,0 +1,24 @@
+- [x] scribble the API
+- [x] write dummy implementation
+- [ ] how to serve HTML with template
+- [ ] create main html
+- [ ] geolocation snippet on the client side
+- [ ] basic, text based client
+- [ ] backend calls only for London
+- [ ] better JSON marshalling
+- [ ] better UI
+- [ ] choose an IDL
+- [ ] write IDL for the API
+
+
+
+API
+- stopsByPosition
+    - coord, radius
+    - [{id: ..., coord: ..., name: ..., distance: ...}]
+- linesByStop
+    - stop
+    - [{id: ..., name: ..., type: ...}]
+- vehiclesByLineAndStop
+    - line, stop
+    - [{id: ..., arrives_at: ...}]
