@@ -13,7 +13,7 @@ func AddHandlers() {
 }
 
 func main(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("web/templates/main.html")
+	t, err := template.ParseFiles("src/web/templates/main.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
