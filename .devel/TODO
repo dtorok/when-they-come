@@ -2,7 +2,7 @@
 - [x] write dummy implementation
 - [x] how to serve HTML with template
 - [x] create main html
-- [ ] geolocation snippet on the client side
+- [x] geolocation snippet on the client side
 - [ ] basic, text based client
 - [ ] backend calls only for London
 - [ ] better JSON marshalling
