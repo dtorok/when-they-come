@@ -3,12 +3,14 @@
 - [x] how to serve HTML with template
 - [x] create main html
 - [x] geolocation snippet on the client side
-- [ ] basic, text based client
+- [x] super basic, text based client
 - [ ] backend calls only for London
 - [ ] better JSON marshalling
 - [ ] better UI
 - [ ] choose an IDL
 - [ ] write IDL for the API
+- [ ] fix deprecated proxy events
+- [ ] ajax error handling
 
 
 

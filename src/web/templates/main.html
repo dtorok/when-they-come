@@ -4,45 +4,152 @@
     <meta charset="UTF-8">
     <title>When do they come?</title>
 
+    <script src='http://cdn.ractivejs.org/latest/ractive.js'></script>
 
-    <script>
-        function geoFindMe() {
-            var output = document.getElementById("out");
+    <script
+            src="https://code.jquery.com/jquery-3.1.1.js"
+            integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+            crossorigin="anonymous"></script>
 
-            if (!navigator.geolocation){
-                output.innerHTML = "<p>Geolocation is not supported by your browser</p>";
-                return;
-            }
-
-            function success(position) {
-                var latitude  = position.coords.latitude;
-                var longitude = position.coords.longitude;
-
-                output.innerHTML = '<p>Latitude is ' + latitude + '° <br>Longitude is ' + longitude + '°</p>';
-
-                var img = new Image();
-                img.src = "https://maps.googleapis.com/maps/api/staticmap?center=" + latitude + "," + longitude + "&zoom=13&size=300x300&sensor=false";
-
-                output.appendChild(img);
-            }
-
-            function error() {
-                output.innerHTML = "Unable to retrieve your location";
-            }
-
-            output.innerHTML = "<p>Locating…</p>";
-
-            navigator.geolocation.getCurrentPosition(success, error);
-        }
-
-    </script>
 </head>
 <body>
 
 <h1>When do they come?</h1>
 
-<p><button onclick="geoFindMe()">Show my location</button></p>
-<div id="out"></div>
+<div id="container"></div>
+
+<script id='template' type='text/ractive'>
+<div id="info">
+    <p><button on-click="findMe">Show my location</button></p>
+
+    <div id="position">
+        {{position.status}}
+        lat: {{position.lat}}, lon: {{position.lon}}
+
+        {{#if position.lat && position.lon}}
+            <img src="https://maps.googleapis.com/maps/api/staticmap?center={{position.lat}},{{position.lon}}&zoom=13&size=300x300&sensor=false" />
+        {{/if}}
+    </div>
+
+    <div id="stops">
+        <button on-click="findStop">Find my stop</button>
+        <ul>
+            {{#each stops.list}}
+                <li on-click="stopSelected:{{this.id}}">{{this.name}}</li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <div id="lines">
+        <ul>
+            {{#each lines.list}}
+                <li on-click="lineSelected:{{this.id}}">{{this.name}}</li>
+            {{/each}}
+        </ul>
+    </div>
+
+    <div id="vehicles">
+        <ul>
+            {{#each vehicles.list}}
+                <li>{{this.name}} arrives at {{this.arrives_at}}</li>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+</script>
+
+
+
+
+<script>
+    var ractive = new Ractive({
+        el: '#container',
+        template: '#template',
+        data: {
+            position: {
+                status: "",
+                lat: 0,
+                lon: 0
+            },
+            stops: {
+                list: [],
+                selected: null
+            },
+            lines: {
+                list: [],
+                selected: null
+            },
+            vehicles: {
+                list: []
+            }
+        }
+    });
+
+    var findMeSuccess = function(position) {
+        ractive.set("position.lat", position.coords.latitude)
+        ractive.set("position.lon", position.coords.longitude)
+    };
+
+    var findMeFailure = function(error) {
+        ractive.set("position.status", "Unable to retrieve your location: " + error)
+    };
+
+    ractive.on('findMe', function() {
+        if (navigator.geolocation){
+            ractive.set("position.status", "Locating...")
+            navigator.geolocation.getCurrentPosition(findMeSuccess, findMeFailure);
+        } else {
+            ractive.set("position.status", "Geolocation is not supported by your browser")
+        }
+    });
+
+    var findStopSuccess = function(data, status) {
+        ractive.set("stops.list", data)
+    };
+
+    ractive.on('findStop', function(event) {
+        $.ajax("/api/v1/stops/", {
+            data: {
+                lat: event.ractive.get("position.lat"),
+                lon: event.ractive.get("position.lon")
+            },
+            success: findStopSuccess
+        })
+    });
+
+    var findLinesSuccess = function(data, status) {
+        ractive.set("lines.list", data)
+    };
+
+    ractive.on('stopSelected', function(event, stopId) {
+        ractive.set("stops.selected", stopId)
+
+        $.ajax("/api/v1/lines/", {
+            data: {
+                stop_id: stopId
+            },
+            success: findLinesSuccess
+        })
+    });
+
+    var findVehiclesSuccess = function(data, status) {
+        ractive.set("vehicles.list", data)
+    };
+
+    ractive.on('lineSelected', function(event, lineId) {
+        ractive.set("event.selected", lineId)
+        var stopId = ractive.get("stops.selected")
+
+        $.ajax("/api/v1/vehicles/", {
+            data: {
+                line_id: lineId,
+                stop_id: stopId
+            },
+            success: findVehiclesSuccess
+        })
+    })
+
+</script>
 
 </body>
 </html>
