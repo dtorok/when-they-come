@@ -6,7 +6,8 @@
 - [x] geolocation snippet on the client side
 - [x] super basic, text based client
 - [x] go through the whole London API
-- [ ] change the client to avoid line selection
+- [x] change the client to avoid line selection
+- [ ] learn about JSON serialization
 - [ ] backend calls only for London
 - [ ] better JSON marshalling
 - [ ] better UI
@@ -39,6 +40,8 @@
     - towards, lineName, timeToStation, expectedArrival
 
 ### Others:
+- https://api.tfl.gov.uk/StopPoint/Meta/stoptypes?app_id=&app_key=
+    - stoptypes
 - https://api.tfl.gov.uk/StopPoint/940GZZLUCHX/Arrivals?app_id=&app_key=
     - lineName, vehicleId, towards, expectedArrival, timeToStation
 
