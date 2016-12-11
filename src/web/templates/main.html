@@ -91,7 +91,7 @@
     };
 
     var findMeFailure = function(error) {
-        ractive.set("position.status", "Unable to retrieve your location: " + error)
+        ractive.set("position.status", "Unable to retrieve your location: " + error.code + " - " + error.message)
     };
 
     ractive.on('findMe', function() {
