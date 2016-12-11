@@ -1,9 +1,12 @@
+## task list
 - [x] scribble the API
 - [x] write dummy implementation
 - [x] how to serve HTML with template
 - [x] create main html
 - [x] geolocation snippet on the client side
 - [x] super basic, text based client
+- [x] go through the whole London API
+- [ ] change the client to avoid line selection
 - [ ] backend calls only for London
 - [ ] better JSON marshalling
 - [ ] better UI
@@ -14,7 +17,7 @@
 
 
 
-API
+## Own API
 - stopsByPosition
     - coord, radius
     - [{id: ..., coord: ..., name: ..., distance: ...}]
@@ -24,3 +27,24 @@ API
 - vehiclesByLineAndStop
     - line, stop
     - [{id: ..., arrives_at: ...}]
+
+
+
+## London API:
+### What to use:
+- https://api.tfl.gov.uk/StopPoint?lat=51.507751&lon=-0.127608&stopTypes=NaptanMetroStation&radius=200&useStopPointHierarchy=True&returnLines=True&app_id=&app_key=
+    - id, commonName, distance, status, lat, lon
+
+- https://api.tfl.gov.uk/StopPoint/940GZZLUCHX/Arrivals?app_id=&app_key=
+    - towards, lineName, timeToStation, expectedArrival
+
+### Others:
+- https://api.tfl.gov.uk/StopPoint/940GZZLUCHX/Arrivals?app_id=&app_key=
+    - lineName, vehicleId, towards, expectedArrival, timeToStation
+
+- https://api.tfl.gov.uk/StopPoint/940GZZLUCHX/Route?app_id=&app_key=
+    - lineId, mode, routeSectionName, isActive, naptanId
+
+- https://api.tfl.gov.uk/Line/bakerloo/Arrivals?stopPointId=940GZZLUCHX&app_id=&app_key=
+    - vehicleId, towards, expectedArrival, timeToStation
+
