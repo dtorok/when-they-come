@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>When do they come?</title>
 
-    <script src='http://cdn.ractivejs.org/latest/ractive.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.8.7/ractive.js'></script>
 
     <script
             src="https://code.jquery.com/jquery-3.1.1.js"
@@ -35,23 +35,15 @@
         <button on-click="findStop">Find my stop</button>
         <ul>
             {{#each stops.list}}
-                <li on-click="stopSelected:{{this.id}}">{{this.name}}</li>
+                <li on-click="stopSelected:{{this.id}}">{{this.name}} ({{this.distance}}m)</li>
             {{/each}}
         </ul>
     </div>
 
-    <div id="lines">
+    <div id="arrivals">
         <ul>
-            {{#each lines.list}}
-                <li on-click="lineSelected:{{this.id}}">{{this.name}}</li>
-            {{/each}}
-        </ul>
-    </div>
-
-    <div id="vehicles">
-        <ul>
-            {{#each vehicles.list}}
-                <li>{{this.name}} arrives at {{this.arrives_at}}</li>
+            {{#each arrivals.list}}
+                <li>A vehicle on {{this.lineName}} towards {{this.towards}} arrives in {{this.arrivesIn}} seconds</li>
             {{/each}}
         </ul>
     </div>
@@ -75,11 +67,7 @@
                 list: [],
                 selected: null
             },
-            lines: {
-                list: [],
-                selected: null
-            },
-            vehicles: {
+            arrivals: {
                 list: []
             }
         }
@@ -117,37 +105,17 @@
         })
     });
 
-    var findLinesSuccess = function(data, status) {
-        ractive.set("lines.list", data)
+    var findArrivesSuccess = function(data, status) {
+        ractive.set("arrivals.list", data)
     };
 
     ractive.on('stopSelected', function(event, stopId) {
         ractive.set("stops.selected", stopId)
 
-        $.ajax("/api/v1/lines/", {
-            data: {
-                stop_id: stopId
-            },
-            success: findLinesSuccess
+        $.ajax("/api/v1/stops/" + stopId + "/", {
+            success: findArrivesSuccess
         })
     });
-
-    var findVehiclesSuccess = function(data, status) {
-        ractive.set("vehicles.list", data)
-    };
-
-    ractive.on('lineSelected', function(event, lineId) {
-        ractive.set("event.selected", lineId)
-        var stopId = ractive.get("stops.selected")
-
-        $.ajax("/api/v1/vehicles/", {
-            data: {
-                line_id: lineId,
-                stop_id: stopId
-            },
-            success: findVehiclesSuccess
-        })
-    })
 
 </script>
 

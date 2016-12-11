@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	//http.HandleFunc("/", handle)
 	http.HandleFunc("/_ah/health", healthcheck.HealthCheckHandler)
 
 	api.AddHandlers()
