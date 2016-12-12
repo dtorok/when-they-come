@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"fmt"
 	"encoding/json"
+	"io/ioutil"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
@@ -21,6 +22,19 @@ type Arrival struct {
 	Towards string   `json:"towards"`
 	ArrivesIn int    `json:"arrivesIn"`
 	ArrivesAt string `json:"arrivesAt"`
+}
+
+type LondonStopPointResult struct {
+	StopPoints []LondonStopPoint `json:"stopPoints"`
+}
+
+type LondonStopPoint struct {
+	Id         string  `json:"id"`
+	CommonName string  `json:"commonName"`
+	Distance   float32 `json:"distance"`
+	Status     string  `json:"status"`
+	Lat        string  `json:"lat"`
+	Lon        string  `json:"lon"`
 }
 
 func AddHandlers() {
@@ -45,15 +59,38 @@ func stopsByPosition(w http.ResponseWriter, r *http.Request) {
 		baseUrl,
 		lat, lon,
 		"NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
+
 	fmt.Println(url)
-	_, err := http.Get(url)
+	resp, err := http.Get(url)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	} else {
+		defer resp.Body.Close()
+		body, _ := ioutil.ReadAll(resp.Body)
+		var res LondonStopPointResult
+
+		_ = json.Unmarshal(body, &res)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		fmt.Println(res.StopPoints[0].CommonName)
+
+		//var sp LondonStopPoint
+		var response []Stop = make([]Stop, len(res.StopPoints))
+		for i, sp := range res.StopPoints {
+			response[i] = Stop{
+				sp.Id,
+				sp.Lat, sp.Lon,
+				sp.CommonName,
+				int(sp.Distance),
+			}
+		}
+
 		w.Header().Set("Content-type", "application/json")
-		s := []Stop{Stop{"stopid1", "123", "234", "Stop1", 234}}
-		json, _ := json.Marshal(s)
+		//s := []Stop{Stop{"stopid1", "123", "234", "Stop1", 234}}
+		json, _ := json.Marshal(response)
 		w.Write(json)
 	}
 }
