@@ -2,17 +2,17 @@ package api
 
 import (
 	"net/http"
-	"fmt"
 	"encoding/json"
-	"io/ioutil"
+	"remote"
+	"strconv"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
 
 type Stop struct {
 	Id string    `json:"id"`
-	Lat string   `json:"lat"`
-	Lon string   `json:"lon"`
+	Lat float64  `json:"lat"`
+	Lon float64  `json:"lon"`
 	Name string  `json:"name"`
 	Distance int `json:"distance"`
 }
@@ -52,52 +52,75 @@ func stopHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func stopsByPosition(w http.ResponseWriter, r *http.Request) {
-	lat := r.URL.Query().Get("lat")
-	lon := r.URL.Query().Get("lon")
+	err := _stopsByPosition(w, r)
 
-	url := fmt.Sprintf("%s/StopPoint/?lat=%s&lon=%s&stopTypes=%s",
-		baseUrl,
-		lat, lon,
-		"NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
-
-	fmt.Println(url)
-	resp, err := http.Get(url)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	} else {
-		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		var res LondonStopPointResult
-
-		_ = json.Unmarshal(body, &res)
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
-		fmt.Println(res.StopPoints[0].CommonName)
-
-		//var sp LondonStopPoint
-		var response []Stop = make([]Stop, len(res.StopPoints))
-		for i, sp := range res.StopPoints {
-			response[i] = Stop{
-				sp.Id,
-				sp.Lat, sp.Lon,
-				sp.CommonName,
-				int(sp.Distance),
-			}
-		}
-
-		w.Header().Set("Content-type", "application/json")
-		//s := []Stop{Stop{"stopid1", "123", "234", "Stop1", 234}}
-		json, _ := json.Marshal(response)
-		w.Write(json)
 	}
 }
 
-func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) {
+func _stopsByPosition(w http.ResponseWriter, r *http.Request) error {
+	lat, err := strconv.ParseFloat(
+		r.URL.Query().Get("lat"), 64)
+	if err != nil {
+		return err
+	}
+
+	lon, err := strconv.ParseFloat(
+		r.URL.Query().Get("lon"), 64)
+	if err != nil {
+		return err
+	}
+
+	stops, err := remote.LondonListStopPoints(lat, lon)
+
+	if err != nil {
+		return err
+	}
+
+	var response []Stop = make([]Stop, len(stops))
+	for i, sp := range stops {
+		response[i] = Stop{
+			sp.Id,
+			sp.Lat, sp.Lon,
+			sp.CommonName,
+			int(sp.Distance),
+		}
+	}
+
+	jsonstring, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
 	w.Header().Set("Content-type", "application/json")
-	arrivals := []Arrival{Arrival{"Bakerloo", "Almafa", 254, "2016-12-20 00:00:00"}}
-	json, _ := json.Marshal(arrivals)
-	w.Write(json)
+	w.Write(jsonstring)
+
+	return nil
+}
+
+func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) {
+	arrivals, err := remote.LondonArrivals(stopId)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	var response []Arrival = make([]Arrival, len(arrivals))
+	for i, arr := range arrivals {
+		response[i] = Arrival{
+			arr.LineName,
+			arr.Towards,
+			arr.TimeToStation,
+			arr.ExpectedArrival,
+		}
+	}
+
+	jsonstring, err := json.Marshal(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	w.Write(jsonstring)
 }
