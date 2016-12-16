@@ -12,7 +12,6 @@
 - [x] better JSON marshalling
 - [ ] better UI
 - [ ] ajax error handling
-
 - [ ] meta layer for the remote calls
 - [ ] refactor go code to have the remote calls injected
 - [ ] write tests for remote

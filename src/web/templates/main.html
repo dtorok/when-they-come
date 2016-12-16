@@ -11,16 +11,31 @@
             integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
             crossorigin="anonymous"></script>
 
+    <style>
+        #googlemap {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+
 </head>
 <body>
 
 <h1>When do they come?</h1>
+
+<div id="googlemap"></div>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>
+
+<br/><br/><br/><br/>
 
 <div id="container"></div>
 
 <script id='template' type='text/ractive'>
 <div id="info">
     <p><button on-click="findMe">Show my location</button></p>
+
+    <div><strong>{{data}}</strong></div>
 
     <div id="position">
         {{position.status}}
@@ -58,6 +73,7 @@
         el: '#container',
         template: '#template',
         data: {
+            data: "",
             position: {
                 status: "",
                 lat: "51.515037",
@@ -117,6 +133,63 @@
         })
     });
 
+
+    function initMap() {
+        var center = {lat: 51.515037, lng: -0.072384};
+        var map = new google.maps.Map(document.getElementById('googlemap'), {
+            zoom: 16,
+            center: center
+        });
+//        var marker = new google.maps.Marker({
+//            position: center,
+//            map: map
+//        });
+
+        map.addListener("dragend", refreshStops)
+        map.addListener("zoom_changed", refreshStops)
+
+        function refreshStops() {
+            var center = map.getCenter()
+
+            $.ajax("/api/v1/stops/", {
+                data: {
+                    lat: center.lat(),
+                    lon: center.lng()
+                },
+                success: function(data, status) {
+                    for (i in data) {
+                        var d = data[i]
+                        var marker = new google.maps.Marker({
+                            position: {
+                                lat: d.lat,
+                                lng: d.lon
+                            },
+                            map: map,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: "white",
+                                fillOpacity: 1,
+                                strokeColor: "blue",
+                                strokeWeight: 2,
+                                scale: 8
+                            }
+                        })
+                        var info = new google.maps.InfoWindow({
+                            content: d.name + " (" + d.distance + " m)"
+                        })
+                        marker.addListener("click", function() {
+                            info.open(map, this)
+                        })
+                        console.log(d.lat, d.lon)
+                        ractive.set("data", d.lat)
+                    }
+                }
+            })
+        }
+
+        refreshStops()
+
+    }
 </script>
 
 </body>
