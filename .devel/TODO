@@ -13,6 +13,7 @@
 - [x] better UI
 - [x] secret management
 - [x] use destinationName if towards is not available (BOW Church DLR Station)
+- [x] add geo location
 - [ ] use bounding box instead of center when searching stops
 - [ ] ajax error handling
 - [ ] meta layer for the remote calls
@@ -28,6 +29,7 @@
 - [ ] add an other API
 - [ ] fix deprecated proxy events
 - [ ] to readme: secret management
+- [ ] to readme: localication + #noloc
 
 
 ## Own API

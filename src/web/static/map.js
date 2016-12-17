@@ -8,8 +8,7 @@ function Map(div, getStops, getVehicles) {
     var currPos;
     var visibleStops = {};
     var init = function() {
-        LONDON = this.coord2Pos(51.515037, -0.072384)
-        currPos = LONDON;
+        currPos = coords2pos(51.515037, -0.072384) // LONDON
 
         initGoogleMaps()
         refreshStops()
@@ -44,16 +43,16 @@ function Map(div, getStops, getVehicles) {
         }
     };
 
-    // ===
-    // public meethods
-    // ===
-    this.setPosition = function(position) {
-
+    var setCenter = function(lat, lng) {
+        currPos = coords2pos(lat, lng)
+        map.setCenter(currPos)
     };
 
-    this.coord2Pos = function(lat, lng) {
+    var coords2pos = function(lat, lng) {
         return {lat: lat, lng: lng}
-    }
+    };
+
+    this.setCenter = setCenter
 
     init()
 }
@@ -128,7 +127,7 @@ function StopInfo(name, distance) {
                 .append(lineName)
                 .append(" line towards ")
                 .append(towards)
-                .append(" arrivesin ")
+                .append(" arrives in ")
                 .append(arrivesIn)
                 .append(" mins")
 

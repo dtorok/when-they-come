@@ -31,8 +31,23 @@
 
 
 <script type="text/javascript">
+    function error(msg) {
+        console.log("ERROR: " + msg)
+    }
     function init() {
-        var map = Map($('#googlemap')[0], getStops, getVehicles)
+        var map = new Map($('#googlemap')[0], getStops, getVehicles)
+
+        if (geoLocationEnabled()) {
+            locateUser(
+                    function(lat, lng) {
+                        map.setCenter(lat, lng) },
+                    function(errorMsg) { error(errorMsg) }
+            )
+        }
+    }
+
+    function geoLocationEnabled() {
+        return window.location.hash != "#noloc"
     }
 
     function getStops(position, callback) {
