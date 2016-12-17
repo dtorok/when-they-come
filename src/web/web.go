@@ -9,6 +9,7 @@ func AddHandlers() {
 	staticHandler := http.StripPrefix("/static/", http.FileServer(http.Dir("web/static")))
 
 	http.Handle("/static/", staticHandler)
+	http.HandleFunc("/test", test)
 	http.HandleFunc("/", main)
 }
 
