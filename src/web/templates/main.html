@@ -4,193 +4,65 @@
     <meta charset="UTF-8">
     <title>When do they come?</title>
 
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/ractive/0.8.7/ractive.js'></script>
-
-    <script
-            src="https://code.jquery.com/jquery-3.1.1.js"
+    <script src="https://code.jquery.com/jquery-3.1.1.js"
             integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
             crossorigin="anonymous"></script>
 
+    <script src="/static/geolocation.js"></script>
+    <script src="/static/map.js"></script>
+
     <style>
+        html { height: 100% }
+        body { height: 100%; margin: 0px; padding: 0px }
         #googlemap {
-            height: 400px;
+            height: 100%;
             width: 100%;
+        }
+
+        .markerContent {
         }
     </style>
 
 </head>
 <body>
-
-<h1>When do they come?</h1>
-
 <div id="googlemap"></div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>
-
-<br/><br/><br/><br/>
-
-<div id="container"></div>
-
-<script id='template' type='text/ractive'>
-<div id="info">
-    <p><button on-click="findMe">Show my location</button></p>
-
-    <div><strong>{{data}}</strong></div>
-
-    <div id="position">
-        {{position.status}}
-        lat: {{position.lat}}, lon: {{position.lon}}
-
-        {{#if position.lat && position.lon}}
-            <img src="https://maps.googleapis.com/maps/api/staticmap?center={{position.lat}},{{position.lon}}&zoom=13&size=300x300&sensor=false" />
-        {{/if}}
-    </div>
-
-    <div id="stops">
-        <button on-click="findStop">Find my stop</button>
-        <ul>
-            {{#each stops.list}}
-                <li on-click="stopSelected:{{this.id}}">{{this.name}} ({{this.distance}}m)</li>
-            {{/each}}
-        </ul>
-    </div>
-
-    <div id="arrivals">
-        <ul>
-            {{#each arrivals.list}}
-                <li>A vehicle on {{this.lineName}} towards {{this.towards}} arrives in {{this.arrivesIn}} seconds</li>
-            {{/each}}
-        </ul>
-    </div>
-</div>
-</script>
+<!--<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap"></script>-->
 
 
+<script type="text/javascript">
+    function init() {
+        var map = Map($('#googlemap')[0], getStops, getVehicles)
+    }
 
-
-<script>
-    var ractive = new Ractive({
-        el: '#container',
-        template: '#template',
-        data: {
-            data: "",
-            position: {
-                status: "",
-                lat: "51.515037",
-                lon: "-0.072384"
-            },
-            stops: {
-                list: [],
-                selected: null
-            },
-            arrivals: {
-                list: []
-            }
-        }
-    });
-
-    var findMeSuccess = function(position) {
-        ractive.set("position.lat", position.coords.latitude)
-        ractive.set("position.lon", position.coords.longitude)
-    };
-
-    var findMeFailure = function(error) {
-        ractive.set("position.status", "Unable to retrieve your location: " + error.code + " - " + error.message)
-    };
-
-    ractive.on('findMe', function() {
-        if (navigator.geolocation){
-            ractive.set("position.status", "Locating...")
-            navigator.geolocation.getCurrentPosition(findMeSuccess, findMeFailure);
-        } else {
-            ractive.set("position.status", "Geolocation is not supported by your browser")
-        }
-    });
-
-    var findStopSuccess = function(data, status) {
-        ractive.set("stops.list", data)
-    };
-
-    ractive.on('findStop', function(event) {
+    function getStops(position, callback) {
         $.ajax("/api/v1/stops/", {
             data: {
-                lat: event.ractive.get("position.lat"),
-                lon: event.ractive.get("position.lon")
+                lat: position.lat(),
+                lon: position.lng()
             },
-            success: findStopSuccess
+            success: function (data, status) {
+                // TODO error handling
+                callback(data)
+            }
         })
-    });
-
-    var findArrivesSuccess = function(data, status) {
-        ractive.set("arrivals.list", data)
-    };
-
-    ractive.on('stopSelected', function(event, stopId) {
-        ractive.set("stops.selected", stopId)
-
-        $.ajax("/api/v1/stops/" + stopId + "/", {
-            success: findArrivesSuccess
-        })
-    });
-
-
-    function initMap() {
-        var center = {lat: 51.515037, lng: -0.072384};
-        var map = new google.maps.Map(document.getElementById('googlemap'), {
-            zoom: 16,
-            center: center
-        });
-//        var marker = new google.maps.Marker({
-//            position: center,
-//            map: map
-//        });
-
-        map.addListener("dragend", refreshStops)
-        map.addListener("zoom_changed", refreshStops)
-
-        function refreshStops() {
-            var center = map.getCenter()
-
-            $.ajax("/api/v1/stops/", {
-                data: {
-                    lat: center.lat(),
-                    lon: center.lng()
-                },
-                success: function(data, status) {
-                    for (i in data) {
-                        var d = data[i]
-                        var marker = new google.maps.Marker({
-                            position: {
-                                lat: d.lat,
-                                lng: d.lon
-                            },
-                            map: map,
-                            icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: "white",
-                                fillOpacity: 1,
-                                strokeColor: "blue",
-                                strokeWeight: 2,
-                                scale: 8
-                            }
-                        })
-                        var info = new google.maps.InfoWindow({
-                            content: d.name + " (" + d.distance + " m)"
-                        })
-                        marker.addListener("click", function() {
-                            info.open(map, this)
-                        })
-                        console.log(d.lat, d.lon)
-                        ractive.set("data", d.lat)
-                    }
-                }
-            })
-        }
-
-        refreshStops()
-
     }
+    function getVehicles(stopId, callback) {
+        $.ajax("/api/v1/stops/" + stopId + "/", {
+            success: function(data, status) {
+                // TODO error handling
+                callback(data)
+            }
+        })
+    }
+
+//    map = new Map();
+
+
+
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{.GoogleAPIKey}}&callback=init"></script>
 
 </body>
 </html>
