@@ -14,8 +14,9 @@
 - [x] secret management
 - [x] use destinationName if towards is not available (BOW Church DLR Station)
 - [x] add geo location
-- [ ] use bounding box instead of center when searching stops
-- [ ] ajax error handling
+- [-] use bounding box instead of center when searching stops
+- [-] google app to production from preview
+- [x] ajax error handling
 - [ ] meta layer for the remote calls
 - [ ] refactor go code to have the remote calls injected
 - [ ] write tests for remote
@@ -30,6 +31,7 @@
 - [ ] fix deprecated proxy events
 - [ ] to readme: secret management
 - [ ] to readme: localication + #noloc
+- [ ] alert popup solution in javascript
 
 
 ## Own API

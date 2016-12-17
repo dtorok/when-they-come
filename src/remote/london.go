@@ -56,9 +56,10 @@ func getCall(url string, res interface{}) error {
 }
 
 func LondonListStopPoints(lat, lon float64) ([]LondonStopPoint, error) {
-	url := fmt.Sprintf("%s/StopPoint/?lat=%f&lon=%f&stopTypes=%s",
+	url := fmt.Sprintf("%s/StopPoint/?lat=%f&lon=%f&radius=%d&stopTypes=%s",
 		baseUrl,
 		lat, lon,
+		1000,
 		"NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
 
 	var res LondonStopPointResult
@@ -68,8 +69,6 @@ func LondonListStopPoints(lat, lon float64) ([]LondonStopPoint, error) {
 	if err != nil {
 		return nil, err
 	} else {
-		//fmt.Println(res)
-		//fmt.Println(res.StopPoints)
 		return res.StopPoints, nil
 	}
 }

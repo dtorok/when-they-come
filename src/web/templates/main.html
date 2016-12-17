@@ -33,6 +33,7 @@
 <script type="text/javascript">
     function error(msg) {
         console.log("ERROR: " + msg)
+        alert(msg)
     }
     function init() {
         var map = new Map($('#googlemap')[0], getStops, getVehicles)
@@ -41,7 +42,7 @@
             locateUser(
                     function(lat, lng) {
                         map.setCenter(lat, lng) },
-                    function(errorMsg) { error(errorMsg) }
+                    function(errorMsg) { error("Couldn't find location. " + errorMsg) }
             )
         }
     }
@@ -56,25 +57,24 @@
                 lat: position.lat(),
                 lon: position.lng()
             },
-            success: function (data, status) {
-                // TODO error handling
+            success: function(data, status) {
                 callback(data)
+            },
+            error: function(jqxhr, textStatus) {
+                error("Couldn't query stops: " + textStatus)
             }
         })
     }
     function getVehicles(stopId, callback) {
         $.ajax("/api/v1/stops/" + stopId + "/", {
             success: function(data, status) {
-                // TODO error handling
                 callback(data)
+            },
+            error: function(jqxhr, textStatus) {
+                error("Couldn't query stops: " + textStatus)
             }
         })
     }
-
-//    map = new Map();
-
-
-
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key={{.GoogleAPIKey}}&callback=init"></script>

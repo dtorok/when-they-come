@@ -69,14 +69,16 @@ function Stop(data, map, getVehicles) {
             lat: lat,
             lng: lon
         },
+        animation: google.maps.Animation.DROP,
         map: map,
-        icon: {
+        icon: '/static/bus-stop-location-64-white.png',
+        icon2: {
             path: google.maps.SymbolPath.CIRCLE,
             fillColor: "white",
             fillOpacity: 1,
             strokeColor: "blue",
             strokeWeight: 2,
-            scale: 18
+            scale: 10
         }
     });
 
