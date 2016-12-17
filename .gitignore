@@ -2,4 +2,4 @@ bin
 pkg
 src/google.golang.org/
 .idea
-
+etc/google_api_key

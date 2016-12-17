@@ -12,6 +12,7 @@
 - [x] better JSON marshalling
 - [x] better UI
 - [ ] secret management
+- [ ] use destinationName if towards is not available (BOW Church DLR Station)
 - [ ] use bounding box instead of center when searching stops
 - [ ] ajax error handling
 - [ ] meta layer for the remote calls
@@ -26,6 +27,7 @@
 - [ ] write IDL for the API
 - [ ] add an other API
 - [ ] fix deprecated proxy events
+- [ ] to readme: secret management
 
 
 ## Own API
