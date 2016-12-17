@@ -10,7 +10,9 @@
 - [x] learn about JSON serialization
 - [x] backend calls only for London
 - [x] better JSON marshalling
-- [ ] better UI
+- [x] better UI
+- [ ] secret management
+- [ ] use bounding box instead of center when searching stops
 - [ ] ajax error handling
 - [ ] meta layer for the remote calls
 - [ ] refactor go code to have the remote calls injected
