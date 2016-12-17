@@ -24,7 +24,7 @@ func test(w http.ResponseWriter, r *http.Request) {
 }
 
 func loadApiKey() (string, error) {
-	data, err := ioutil.ReadFile("etc/google_api_key.ini")
+	data, err := ioutil.ReadFile("etc/google_api_key")
 	if err != nil {
 		return "", err
 	} else {
