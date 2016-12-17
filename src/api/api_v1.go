@@ -108,9 +108,14 @@ func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) {
 
 	var response []Arrival = make([]Arrival, len(arrivals))
 	for i, arr := range arrivals {
+		var towards = arr.Towards
+		if towards == "" {
+			towards = arr.DestinationName
+		}
+
 		response[i] = Arrival{
 			arr.LineName,
-			arr.Towards,
+			towards,
 			arr.TimeToStation,
 			arr.ExpectedArrival,
 		}

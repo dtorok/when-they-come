@@ -27,6 +27,7 @@ type LondonArrival struct {
 	LineName        string `json:"lineName"`
 	TimeToStation   int    `json:"timeToStation"`
 	ExpectedArrival string `json:"expectedArrival"`
+	DestinationName string `json:"destinationName"`
 }
 
 func getCall(url string, res interface{}) error {
