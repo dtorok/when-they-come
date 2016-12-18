@@ -3,6 +3,7 @@ package remote
 import (
 	"fmt"
 	"net/url"
+	"log"
 )
 
 const londonBaseScheme = "https"
@@ -39,6 +40,8 @@ func NewLondonTransportAPI(client HttpClient) LondonTransportAPI {
 }
 
 func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
+	log.Printf("uk_london list_stop_points_around %f %f", lat, lon)
+
 	query := url.Values{}
 	query.Set("lat", fmt.Sprintf("%f", lat))
 	query.Set("lon", fmt.Sprintf("%f", lon))
@@ -76,6 +79,8 @@ func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, er
 }
 
 func (api LondonTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, error) {
+	log.Printf("uk_london list_arrivals_of %s", stopPointId)
+
 	trUrl := url.URL{
 		Scheme: londonBaseScheme,
 		Host: londonBaseHost,

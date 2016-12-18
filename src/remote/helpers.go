@@ -3,11 +3,12 @@ package remote
 import (
 	"io/ioutil"
 	"encoding/json"
-	"fmt"
+	"log"
 )
 
 func httpJsonGET(client HttpClient, url string, res interface{}) error {
-	fmt.Println(url)
+	log.Printf("outgoing_request %s", url)
+
 	resp, err := client.Get(url)
 	if err != nil {
 		return err

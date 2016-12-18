@@ -8,6 +8,7 @@ import (
 	"strings"
 	"fmt"
 	"errors"
+	"log"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
@@ -31,12 +32,16 @@ func (api BackendApi) decorator(handler internal_handler) http_handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := handler(w, r)
 		if err != nil {
+			log.Printf("handler_error %s", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		jsonString, err := json.Marshal(result)
 		if err != nil {
+			log.Printf("json_marshalling_error %s", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 
 		w.Header().Set("Content-type", "application/json")
@@ -71,6 +76,7 @@ func (api BackendApi) parseFloatFromQuery(r *http.Request, name string) (float64
 }
 
 func (api *BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) ([]remote.Stop, error) {
+	log.Printf("incoming_request stop_by_position %s", r.URL.String())
 	lat, err := api.parseFloatFromQuery(r, "lat")
 	if err != nil {
 		return nil, err
@@ -91,6 +97,7 @@ func (api *BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) (
 }
 
 func (api BackendApi) arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) ([]remote.Arrival, error) {
+	log.Printf("incoming_request arrivals_by_stop %s %s", stopId, r.URL.String())
 	arrivals, err := api.trApi.ListArrivalsOf(stopId)
 
 	if err != nil {

@@ -27,7 +27,7 @@
 - [x] URL get parameters with framework, not string operations
 - [x] better parsing the stopId from the URL
 - [x] order arrivals by time
-- [ ] add logging
+- [x] add logging
 - [-] add parallel combiner
 - [x] add byCoord combiner
 - [-] parse and serialize datetime
@@ -37,7 +37,8 @@
 - [-] fix deprecated proxy events
 - [ ] to readme: secret management
 - [ ] to readme: localication + #noloc
-- [ ] alert popup solution in javascript
+- [-] alert popup solution in javascript
+- [ ] make repository accessible
 
 
 ## Own API

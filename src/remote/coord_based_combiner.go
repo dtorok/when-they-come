@@ -1,6 +1,9 @@
 package remote
 
-import "strings"
+import (
+	"strings"
+	"log"
+)
 
 type CoordBasedCombinedTransportAPI struct {
 	ukLondonPrefix string
@@ -28,6 +31,8 @@ func (api CoordBasedCombinedTransportAPI) ListStopPointsAround(lat, lon float64)
 		trApi = api.huBudapestApi
 	}
 
+	log.Printf("coord_based_combined_api list_stop_points %s", prefix)
+
 	stops, err := trApi.ListStopPointsAround(lat, lon)
 
 	if err != nil {
@@ -52,6 +57,8 @@ func (api CoordBasedCombinedTransportAPI) ListArrivalsOf(stopPointId string) ([]
 		prefix = api.huBudapestPrefix
 		trApi = api.huBudapestApi
 	}
+
+	log.Printf("coord_based_combined_api list_arrivals_of %s", prefix)
 
 	stopPointId = stopPointId[len(prefix):]
 

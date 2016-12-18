@@ -76,6 +76,8 @@ func NewBudapestTransportAPI(client HttpClient) BudapestTransportAPI {
 }
 
 func (api BudapestTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
+	log.Printf("hu_budapest list_stop_points_around %f %f", lat, lon)
+
 	const MAX_NUM = 200
 
 	latFrom := lat - 0.01
@@ -110,6 +112,8 @@ func (api BudapestTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, 
 }
 
 func (api BudapestTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, error) {
+	log.Printf("hu_budapest list_arrivals_of %s", stopPointId)
+
 	query := url.Values{}
 	query.Set("stopId", "BKK_" + stopPointId)
 	query.Set("onlyDepartures", "1")
