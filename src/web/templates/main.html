@@ -54,8 +54,8 @@
     function getStops(position, callback) {
         $.ajax("/api/v1/stops/", {
             data: {
-                lat: position.lat(),
-                lon: position.lng()
+                lat: position.lat,
+                lon: position.lng
             },
             success: function(data, status) {
                 callback(data)

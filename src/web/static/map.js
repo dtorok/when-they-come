@@ -25,9 +25,7 @@ function Map(div, getStops, getVehicles) {
     };
 
     var refreshStops = function() {
-        var center = map.getCenter()
-
-        getStops(center, showStops)
+        getStops(currPos, showStops)
     };
 
     var showStops = function(data) {
@@ -46,6 +44,7 @@ function Map(div, getStops, getVehicles) {
     var setCenter = function(lat, lng) {
         currPos = coords2pos(lat, lng)
         map.setCenter(currPos)
+        refreshStops()
     };
 
     var coords2pos = function(lat, lng) {
