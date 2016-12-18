@@ -8,22 +8,13 @@ package main
 import (
 	"log"
 	"net/http"
-	"healthcheck"
 	"api"
 	"web"
-	"remote"
 )
 
 func main() {
-	http.HandleFunc("/_ah/health", healthcheck.HealthCheckHandler)
-
 	web.AddHandlers()
-
-	httpClient := http.Client{}
-	//trApi := remote.NewLondonTransportAPI(&httpClient)
-	trApi := remote.NewBudapestTransportAPI(&httpClient)
-	backend := api.NewBackendApi(&trApi)
-	backend.AddHandlers()
+	api.AddHandlers()
 
 	log.Print("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

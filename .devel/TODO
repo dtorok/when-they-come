@@ -21,6 +21,7 @@
 - [x] decorator for error handling and json response
 - [x] refactor go code to have the remote calls injected
 - [x] add BKK
+- [x] move healthcheck under api
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
 - [x] URL get parameters with framework, not string operations
