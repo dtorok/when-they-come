@@ -29,10 +29,10 @@ type Arrival struct {
 }
 
 type BackendApi struct {
-	trApi *remote.LondonTransportAPI
+	trApi remote.TransportAPI
 }
 
-func NewBackendApi(trApi *remote.LondonTransportAPI) BackendApi {
+func NewBackendApi(trApi remote.TransportAPI) BackendApi {
 	return BackendApi{trApi}
 }
 
