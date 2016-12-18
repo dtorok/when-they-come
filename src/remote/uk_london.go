@@ -8,8 +8,8 @@ import (
 	"encoding/json"
 )
 
-const baseScheme = "https"
-const baseHost = "api.tfl.gov.uk"
+const londonBaseScheme = "https"
+const londonBaseHost = "api.tfl.gov.uk"
 
 type LondonStopPointResult struct {
 	StopPoints []LondonStopPoint `json:"stopPoints"`
@@ -70,8 +70,8 @@ func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, er
 	query.Set("stopTypes", "NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
 
 	trUrl := url.URL{
-		Scheme: baseScheme,
-		Host: baseHost,
+		Scheme: londonBaseScheme,
+		Host: londonBaseHost,
 		Path: "/StopPoint/",
 		RawQuery: query.Encode(),
 	}
@@ -101,8 +101,8 @@ func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, er
 
 func (api LondonTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, error) {
 	trUrl := url.URL{
-		Scheme: baseScheme,
-		Host: baseHost,
+		Scheme: londonBaseScheme,
+		Host: londonBaseHost,
 		Path: "/StopPoint/" + stopPointId + "/Arrivals/",
 	}
 

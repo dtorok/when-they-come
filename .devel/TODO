@@ -20,15 +20,19 @@
 - [x] meta layer for the remote calls
 - [x] decorator for error handling and json response
 - [x] refactor go code to have the remote calls injected
+- [x] add BKK
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
 - [x] URL get parameters with framework, not string operations
 - [x] better parsing the stopId from the URL
 - [x] order arrivals by time
+- [ ] add logging
+- [ ] add parallel combiner
+- [ ] add byCoord combiner
 - [ ] parse and serialize datetime
+- [ ] move getCall to a common place
 - [ ] choose an IDL
 - [ ] write IDL for the API
-- [ ] add an other API
 - [-] fix deprecated proxy events
 - [ ] to readme: secret management
 - [ ] to readme: localication + #noloc
@@ -68,3 +72,5 @@
 - https://api.tfl.gov.uk/Line/bakerloo/Arrivals?stopPointId=940GZZLUCHX&app_id=&app_key=
     - vehicleId, towards, expectedArrival, timeToStation
 
+
+- http://futar.bkk.hu/bkk-utvonaltervezo-api/ws/otp/api/where/arrivals-and-departures-for-stop.json?stopId=BKK_008519&onlyDepartures=1&minutesBefore=0&minutesAfter=40
