@@ -23,7 +23,7 @@
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
 - [x] URL get parameters with framework, not string operations
-- [ ] better parsing the stopId from the URL
+- [x] better parsing the stopId from the URL
 - [x] order arrivals by time
 - [ ] parse and serialize datetime
 - [ ] choose an IDL

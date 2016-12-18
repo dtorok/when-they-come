@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strconv"
 	"remote"
+	"strings"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
@@ -58,11 +59,12 @@ func (api BackendApi) decorator(handler internal_handler) http_handler {
 }
 
 func (api BackendApi) handler(w http.ResponseWriter, r *http.Request) (interface{}, error){
-	stopId := r.URL.Path[len("/api/v1/stops/"):]
+	parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 
-	if stopId == "" {
+	if len(parts) <= 3 {
 		return api.stopsByPosition(w, r)
 	} else {
+		stopId := parts[3]
 		return api.arrivalsByStop(w, r, stopId)
 	}
 }
