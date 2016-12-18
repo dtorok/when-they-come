@@ -31,15 +31,16 @@ type LondonArrival struct {
 }
 
 type LondonTransportAPI struct {
+	client *http.Client
 }
 
-func NewLondonTransportAPI() LondonTransportAPI {
-	return LondonTransportAPI{}
+func NewLondonTransportAPI(client *http.Client) LondonTransportAPI {
+	return LondonTransportAPI{client}
 }
 
 func (api LondonTransportAPI) getCall(url string, res interface{}) error {
 	fmt.Println(url)
-	resp, err := http.Get(url)
+	resp, err := api.client.Get(url)
 	if err != nil {
 		return err
 	} else {

@@ -19,12 +19,13 @@
 - [x] ajax error handling
 - [x] meta layer for the remote calls
 - [x] decorator for error handling and json response
-- [ ] refactor go code to have the remote calls injected
+- [x] refactor go code to have the remote calls injected
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
 - [ ] URL get parameters with framework, not string operations
-- [ ] order arrivals by time
+- [x] order arrivals by time
 - [ ] parse and serialize datetime
+- [ ] better parsing the stopId from the URL
 - [ ] choose an IDL
 - [ ] write IDL for the API
 - [ ] add an other API

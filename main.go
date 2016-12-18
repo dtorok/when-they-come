@@ -6,28 +6,24 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"healthcheck"
 	"api"
 	"web"
+	"remote"
 )
 
 func main() {
 	http.HandleFunc("/_ah/health", healthcheck.HealthCheckHandler)
 
-	api.AddHandlers()
 	web.AddHandlers()
+
+	httpClient := http.Client{}
+	trApi := remote.NewLondonTransportAPI(&httpClient)
+	backend := api.NewBackendApi(&trApi)
+	backend.AddHandlers()
 
 	log.Print("Listening on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func handle(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
-		return
-	}
-	fmt.Fprint(w, "Hello world")
 }

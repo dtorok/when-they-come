@@ -3,8 +3,8 @@ package api
 import (
 	"net/http"
 	"encoding/json"
-	"remote"
 	"strconv"
+	"remote"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
@@ -27,12 +27,19 @@ type Arrival struct {
 	ArrivesAt string `json:"arrivesAt"`
 }
 
-
-func AddHandlers() {
-	http.HandleFunc("/api/v1/stops/", decorator(stopHandler))
+type BackendApi struct {
+	trApi *remote.LondonTransportAPI
 }
 
-func decorator(handler internal_handler) http_handler {
+func NewBackendApi(trApi *remote.LondonTransportAPI) BackendApi {
+	return BackendApi{trApi}
+}
+
+func (api BackendApi) AddHandlers() {
+	http.HandleFunc("/api/v1/stops/", api.decorator(api.handler))
+}
+
+func (api BackendApi) decorator(handler internal_handler) http_handler {
 	return func(w http.ResponseWriter, r *http.Request) {
 		result, err := handler(w, r)
 		if err != nil {
@@ -50,17 +57,17 @@ func decorator(handler internal_handler) http_handler {
 
 }
 
-func stopHandler(w http.ResponseWriter, r *http.Request) (interface{}, error){
+func (api BackendApi) handler(w http.ResponseWriter, r *http.Request) (interface{}, error){
 	stopId := r.URL.Path[len("/api/v1/stops/"):]
 
 	if stopId == "" {
-		return stopsByPosition(w, r)
+		return api.stopsByPosition(w, r)
 	} else {
-		return arrivalsByStop(w, r, stopId)
+		return api.arrivalsByStop(w, r, stopId)
 	}
 }
 
-func stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+func (api BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error) {
 	lat, err := strconv.ParseFloat(r.URL.Query().Get("lat"), 64)
 	if err != nil {
 		return nil, err
@@ -71,8 +78,7 @@ func stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error
 		return nil, err
 	}
 
-	api := remote.NewLondonTransportAPI()
-	stops, err := api.ListStopPointsAround(lat, lon)
+	stops, err := api.trApi.ListStopPointsAround(lat, lon)
 
 	if err != nil {
 		return nil, err
@@ -81,9 +87,8 @@ func stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error
 	}
 }
 
-func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) (interface{}, error) {
-	api := remote.NewLondonTransportAPI()
-	arrivals, err := api.ListArrivalsOf(stopId)
+func (api BackendApi) arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) (interface{}, error) {
+	arrivals, err := api.trApi.ListArrivalsOf(stopId)
 
 	if err != nil {
 		return nil, err
