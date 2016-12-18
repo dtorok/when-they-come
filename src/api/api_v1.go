@@ -9,6 +9,9 @@ import (
 
 const baseUrl = "https://api.tfl.gov.uk/"
 
+type http_handler func(w http.ResponseWriter, r *http.Request)
+type internal_handler func(w http.ResponseWriter, r *http.Request) (interface{}, error)
+
 type Stop struct {
 	Id string    `json:"id"`
 	Lat float64  `json:"lat"`
@@ -26,71 +29,66 @@ type Arrival struct {
 
 
 func AddHandlers() {
-	http.HandleFunc("/api/v1/stops/", stopHandler)
+	http.HandleFunc("/api/v1/stops/", decorator(stopHandler))
 }
 
-func stopHandler(w http.ResponseWriter, r *http.Request) {
+func decorator(handler internal_handler) http_handler {
+	return func(w http.ResponseWriter, r *http.Request) {
+		result, err := handler(w, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		jsonString, err := json.Marshal(result)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("Content-type", "application/json")
+		w.Write(jsonString)
+	}
+
+}
+
+func stopHandler(w http.ResponseWriter, r *http.Request) (interface{}, error){
 	stopId := r.URL.Path[len("/api/v1/stops/"):]
 
 	if stopId == "" {
-		stopsByPosition(w, r)
+		return stopsByPosition(w, r)
 	} else {
-		arrivalsByStop(w, r, stopId)
+		return arrivalsByStop(w, r, stopId)
 	}
 }
 
-func stopsByPosition(w http.ResponseWriter, r *http.Request) {
-	err := _stopsByPosition(w, r)
-
+func stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error) {
+	lat, err := strconv.ParseFloat(r.URL.Query().Get("lat"), 64)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func _stopsByPosition(w http.ResponseWriter, r *http.Request) error {
-	lat, err := strconv.ParseFloat(
-		r.URL.Query().Get("lat"), 64)
-	if err != nil {
-		return err
+		return nil, err
 	}
 
-	lon, err := strconv.ParseFloat(
-		r.URL.Query().Get("lon"), 64)
+	lon, err := strconv.ParseFloat(r.URL.Query().Get("lon"), 64)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	api := remote.NewLondonTransportAPI()
 	stops, err := api.ListStopPointsAround(lat, lon)
 
 	if err != nil {
-		return err
+		return nil, err
+	} else {
+		return stops, nil
 	}
-
-	jsonstring, err := json.Marshal(stops)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Header().Set("Content-type", "application/json")
-	w.Write(jsonstring)
-
-	return nil
 }
 
-func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) {
+func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) (interface{}, error) {
 	api := remote.NewLondonTransportAPI()
 	arrivals, err := api.ListArrivalsOf(stopId)
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return nil, err
+	} else {
+		return arrivals, nil
 	}
 
-	jsonstring, err := json.Marshal(arrivals)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	w.Header().Set("Content-type", "application/json")
-	w.Write(jsonstring)
 }

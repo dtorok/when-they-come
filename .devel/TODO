@@ -18,10 +18,10 @@
 - [-] google app to production from preview
 - [x] ajax error handling
 - [x] meta layer for the remote calls
+- [x] decorator for error handling and json response
 - [ ] refactor go code to have the remote calls injected
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
-- [ ] decorator for error handling and json response
 - [ ] URL get parameters with framework, not string operations
 - [ ] order arrivals by time
 - [ ] parse and serialize datetime
