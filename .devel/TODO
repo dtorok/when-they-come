@@ -17,7 +17,7 @@
 - [-] use bounding box instead of center when searching stops
 - [-] google app to production from preview
 - [x] ajax error handling
-- [ ] meta layer for the remote calls
+- [x] meta layer for the remote calls
 - [ ] refactor go code to have the remote calls injected
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected

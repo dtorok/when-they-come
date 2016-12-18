@@ -30,7 +30,14 @@ type LondonArrival struct {
 	DestinationName string `json:"destinationName"`
 }
 
-func getCall(url string, res interface{}) error {
+type LondonTransportAPI struct {
+}
+
+func NewLondonTransportAPI() LondonTransportAPI {
+	return LondonTransportAPI{}
+}
+
+func (api LondonTransportAPI) getCall(url string, res interface{}) error {
 	fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
@@ -39,14 +46,11 @@ func getCall(url string, res interface{}) error {
 		defer resp.Body.Close()
 
 		body, err := ioutil.ReadAll(resp.Body)
-		//fmt.Println(string(body[:]))
 		if err != nil {
 			return err
 		}
 
 		err = json.Unmarshal(body, &res)
-		//fmt.Println(res)
-		//fmt.Println(err)
 		if err != nil {
 			return err
 		}
@@ -55,7 +59,7 @@ func getCall(url string, res interface{}) error {
 	}
 }
 
-func LondonListStopPoints(lat, lon float64) ([]LondonStopPoint, error) {
+func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
 	url := fmt.Sprintf("%s/StopPoint/?lat=%f&lon=%f&radius=%d&stopTypes=%s",
 		baseUrl,
 		lat, lon,
@@ -64,27 +68,54 @@ func LondonListStopPoints(lat, lon float64) ([]LondonStopPoint, error) {
 
 	var res LondonStopPointResult
 
-	err := getCall(url, &res)
+	err := api.getCall(url, &res)
 
 	if err != nil {
 		return nil, err
-	} else {
-		return res.StopPoints, nil
 	}
+
+	stops := res.StopPoints
+
+	var response = make([]Stop, len(stops))
+	for i, sp := range stops {
+		response[i] = Stop{
+			sp.Id,
+			sp.Lat, sp.Lon,
+			sp.CommonName,
+			int(sp.Distance),
+		}
+	}
+
+	return response, nil
 }
 
-func LondonArrivals(stopPointId string) ([]LondonArrival, error) {
+func (api LondonTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, error) {
 	url := fmt.Sprintf("%s/StopPoint/%s/Arrivals/",
 		baseUrl,
 		stopPointId)
 
 	var res []LondonArrival
 
-	err := getCall(url, &res)
+	err := api.getCall(url, &res)
 
 	if err != nil {
 		return nil, err
-	} else {
-		return res, nil
 	}
+
+	var response []Arrival = make([]Arrival, len(res))
+	for i, arr := range res {
+		var towards = arr.Towards
+		if towards == "" {
+			towards = arr.DestinationName
+		}
+
+		response[i] = Arrival{
+			arr.LineName,
+			towards,
+			arr.TimeToStation,
+			arr.ExpectedArrival,
+		}
+	}
+
+	return response, nil
 }

@@ -24,18 +24,6 @@ type Arrival struct {
 	ArrivesAt string `json:"arrivesAt"`
 }
 
-type LondonStopPointResult struct {
-	StopPoints []LondonStopPoint `json:"stopPoints"`
-}
-
-type LondonStopPoint struct {
-	Id         string  `json:"id"`
-	CommonName string  `json:"commonName"`
-	Distance   float32 `json:"distance"`
-	Status     string  `json:"status"`
-	Lat        string  `json:"lat"`
-	Lon        string  `json:"lon"`
-}
 
 func AddHandlers() {
 	http.HandleFunc("/api/v1/stops/", stopHandler)
@@ -72,23 +60,14 @@ func _stopsByPosition(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 
-	stops, err := remote.LondonListStopPoints(lat, lon)
+	api := remote.NewLondonTransportAPI()
+	stops, err := api.ListStopPointsAround(lat, lon)
 
 	if err != nil {
 		return err
 	}
 
-	var response []Stop = make([]Stop, len(stops))
-	for i, sp := range stops {
-		response[i] = Stop{
-			sp.Id,
-			sp.Lat, sp.Lon,
-			sp.CommonName,
-			int(sp.Distance),
-		}
-	}
-
-	jsonstring, err := json.Marshal(response)
+	jsonstring, err := json.Marshal(stops)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -100,28 +79,14 @@ func _stopsByPosition(w http.ResponseWriter, r *http.Request) error {
 }
 
 func arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) {
-	arrivals, err := remote.LondonArrivals(stopId)
+	api := remote.NewLondonTransportAPI()
+	arrivals, err := api.ListArrivalsOf(stopId)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var response []Arrival = make([]Arrival, len(arrivals))
-	for i, arr := range arrivals {
-		var towards = arr.Towards
-		if towards == "" {
-			towards = arr.DestinationName
-		}
-
-		response[i] = Arrival{
-			arr.LineName,
-			towards,
-			arr.TimeToStation,
-			arr.ExpectedArrival,
-		}
-	}
-
-	jsonstring, err := json.Marshal(response)
+	jsonstring, err := json.Marshal(arrivals)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
