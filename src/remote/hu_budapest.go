@@ -2,7 +2,6 @@ package remote
 
 import (
 	"encoding/json"
-	"net/http"
 	"log"
 	"io/ioutil"
 	"strings"
@@ -16,7 +15,7 @@ const budapestBaseHost = "futar.bkk.hu"
 
 
 type BudapestTransportAPI struct {
-	client *http.Client
+	client HttpClient
 	stops []BudapestStop
 }
 
@@ -83,7 +82,7 @@ func (api BudapestTransportAPI) getCall(url string, res interface{}) error {
 	}
 }
 
-func NewBudapestTransportAPI(client *http.Client) BudapestTransportAPI {
+func NewBudapestTransportAPI(client HttpClient) BudapestTransportAPI {
 	data, err := ioutil.ReadFile("src/remote/hu_budapest_stops.json")
 	if err != nil {
 		log.Fatal("Couldn't open src/remote/hu_budapest_stops.json file")

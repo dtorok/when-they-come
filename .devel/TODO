@@ -23,7 +23,7 @@
 - [x] add BKK
 - [x] move healthcheck under api
 - [x] write API tests with mock remote injected
-- [ ] write tests for remote
+- [x] write tests for remote
 - [ ] write integration test for the whole flow
 - [x] URL get parameters with framework, not string operations
 - [x] better parsing the stopId from the URL

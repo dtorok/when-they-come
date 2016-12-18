@@ -2,7 +2,6 @@ package remote
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"io/ioutil"
 	"encoding/json"
@@ -10,6 +9,7 @@ import (
 
 const londonBaseScheme = "https"
 const londonBaseHost = "api.tfl.gov.uk"
+
 
 type LondonStopPointResult struct {
 	StopPoints []LondonStopPoint `json:"stopPoints"`
@@ -33,10 +33,10 @@ type LondonArrival struct {
 }
 
 type LondonTransportAPI struct {
-	client *http.Client
+	client HttpClient
 }
 
-func NewLondonTransportAPI(client *http.Client) LondonTransportAPI {
+func NewLondonTransportAPI(client HttpClient) LondonTransportAPI {
 	return LondonTransportAPI{client}
 }
 

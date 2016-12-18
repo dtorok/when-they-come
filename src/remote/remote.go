@@ -1,5 +1,6 @@
 package remote
 
+import "net/http"
 
 type Stop struct {
 	Id string    `json:"id"`
@@ -19,4 +20,8 @@ type Arrival struct {
 type TransportAPI interface {
 	ListStopPointsAround(lat, lon float64) ([]Stop, error)
 	ListArrivalsOf(stopPointId string) ([]Arrival, error)
+}
+
+type HttpClient interface {
+	Get(url string) (resp *http.Response, err error)
 }

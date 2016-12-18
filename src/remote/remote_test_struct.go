@@ -1,5 +1,13 @@
 package remote
 
+import (
+	"net/http"
+	"io"
+	"testing"
+)
+
+
+// MockTransportAPI
 type MockTransportAPI struct {
 	ReturnValueListStopPointsAround []Stop
 	ErrorListStopPointsAround error
@@ -28,3 +36,39 @@ func (api *MockTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, erro
 	return api.ReturnValueListArrivalsOf, api.ErrorListArrivalsOf
 }
 
+
+// MockHttpClient
+type MockHttpClient struct {
+	ReturnValueGet *http.Response
+	ErrorGet error
+
+	TrackGetCalled bool
+	TrackGetUrl string
+}
+
+func (client *MockHttpClient) Get(url string) (resp *http.Response, err error) {
+	client.TrackGetCalled = true
+	client.TrackGetUrl = url
+
+	return client.ReturnValueGet, client.ErrorGet
+}
+
+
+// fakeReadCloser
+type fakeReadCloser struct {
+	io.Reader
+}
+
+func (rc fakeReadCloser) Close() error { return nil }
+
+
+// checkExpectedHttpCall
+func checkExpectedHttpCall(t *testing.T, client MockHttpClient, expectedUrl string) {
+	if !client.TrackGetCalled {
+		t.Error("Method `TrackGetCalled` should've been called")
+	}
+
+	if client.TrackGetUrl != expectedUrl {
+		t.Errorf("Unexpected URL called (%s != %s)", client.TrackGetUrl, expectedUrl)
+	}
+}
