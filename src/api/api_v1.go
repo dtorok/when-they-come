@@ -6,27 +6,14 @@ import (
 	"strconv"
 	"remote"
 	"strings"
+	"fmt"
+	"errors"
 )
 
 const baseUrl = "https://api.tfl.gov.uk/"
 
 type http_handler func(w http.ResponseWriter, r *http.Request)
 type internal_handler func(w http.ResponseWriter, r *http.Request) (interface{}, error)
-
-type Stop struct {
-	Id string    `json:"id"`
-	Lat float64  `json:"lat"`
-	Lon float64  `json:"lon"`
-	Name string  `json:"name"`
-	Distance int `json:"distance"`
-}
-
-type Arrival struct {
-	LineName string  `json:"lineName"`
-	Towards string   `json:"towards"`
-	ArrivesIn int    `json:"arrivesIn"`
-	ArrivesAt string `json:"arrivesAt"`
-}
 
 type BackendApi struct {
 	trApi remote.TransportAPI
@@ -69,13 +56,27 @@ func (api BackendApi) handler(w http.ResponseWriter, r *http.Request) (interface
 	}
 }
 
-func (api BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) (interface{}, error) {
-	lat, err := strconv.ParseFloat(r.URL.Query().Get("lat"), 64)
+func (api BackendApi) parseFloatFromQuery(r *http.Request, name string) (float64, error) {
+	sVal := r.URL.Query().Get(name)
+	if sVal == "" {
+		return 0, errors.New(fmt.Sprintf("Parameter `%s` not found or empty", name))
+	}
+
+	val, err := strconv.ParseFloat(sVal, 64)
+	if err != nil {
+		return 0, errors.New(fmt.Sprintf("Parameter `%s` is not a proper float (%s)", name, err))
+	}
+
+	return val, nil
+}
+
+func (api *BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) ([]remote.Stop, error) {
+	lat, err := api.parseFloatFromQuery(r, "lat")
 	if err != nil {
 		return nil, err
 	}
 
-	lon, err := strconv.ParseFloat(r.URL.Query().Get("lon"), 64)
+	lon, err := api.parseFloatFromQuery(r, "lon")
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +90,7 @@ func (api BackendApi) stopsByPosition(w http.ResponseWriter, r *http.Request) (i
 	}
 }
 
-func (api BackendApi) arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) (interface{}, error) {
+func (api BackendApi) arrivalsByStop(w http.ResponseWriter, r *http.Request, stopId string) ([]remote.Arrival, error) {
 	arrivals, err := api.trApi.ListArrivalsOf(stopId)
 
 	if err != nil {

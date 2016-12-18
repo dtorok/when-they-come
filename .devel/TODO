@@ -22,8 +22,9 @@
 - [x] refactor go code to have the remote calls injected
 - [x] add BKK
 - [x] move healthcheck under api
+- [x] write API tests with mock remote injected
 - [ ] write tests for remote
-- [ ] write API tests with mock remote injected
+- [ ] write integration test for the whole flow
 - [x] URL get parameters with framework, not string operations
 - [x] better parsing the stopId from the URL
 - [x] order arrivals by time
