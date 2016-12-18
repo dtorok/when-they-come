@@ -20,8 +20,8 @@ function Map(div, getStops, getVehicles) {
             center: currPos
         });
 
-        map.addListener("dragend", refreshStops)
-        map.addListener("zoom_changed", refreshStops)
+        map.addListener("dragend", refreshCurrPos)
+        map.addListener("zoom_changed", refreshCurrPos)
     };
 
     var refreshStops = function() {
@@ -41,10 +41,14 @@ function Map(div, getStops, getVehicles) {
         }
     };
 
-    var setCenter = function(lat, lng) {
-        currPos = coords2pos(lat, lng)
-        map.setCenter(currPos)
+    var refreshCurrPos = function() {
+        currPos = map.getCenter()
         refreshStops()
+    }
+
+    var setCenter = function(lat, lng) {
+        map.setCenter(coords2pos(lat, lng))
+        refreshCurrPos()
     };
 
     var coords2pos = function(lat, lng) {
