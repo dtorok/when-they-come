@@ -3,11 +3,13 @@ package remote
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"io/ioutil"
 	"encoding/json"
 )
 
-const baseUrl = "https://api.tfl.gov.uk/"
+const baseScheme = "https"
+const baseHost = "api.tfl.gov.uk"
 
 type LondonStopPointResult struct {
 	StopPoints []LondonStopPoint `json:"stopPoints"`
@@ -61,15 +63,22 @@ func (api LondonTransportAPI) getCall(url string, res interface{}) error {
 }
 
 func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
-	url := fmt.Sprintf("%s/StopPoint/?lat=%f&lon=%f&radius=%d&stopTypes=%s",
-		baseUrl,
-		lat, lon,
-		1000,
-		"NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
+	query := url.Values{}
+	query.Set("lat", fmt.Sprintf("%f", lat))
+	query.Set("lon", fmt.Sprintf("%f", lon))
+	query.Set("radius", "1000")
+	query.Set("stopTypes", "NaptanBusCoachStation,NaptanFerryPort,NaptanMetroStation,NaptanRailStation")
+
+	trUrl := url.URL{
+		Scheme: baseScheme,
+		Host: baseHost,
+		Path: "/StopPoint/",
+		RawQuery: query.Encode(),
+	}
 
 	var res LondonStopPointResult
 
-	err := api.getCall(url, &res)
+	err := api.getCall(trUrl.String(), &res)
 
 	if err != nil {
 		return nil, err
@@ -91,13 +100,15 @@ func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, er
 }
 
 func (api LondonTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, error) {
-	url := fmt.Sprintf("%s/StopPoint/%s/Arrivals/",
-		baseUrl,
-		stopPointId)
+	trUrl := url.URL{
+		Scheme: baseScheme,
+		Host: baseHost,
+		Path: "/StopPoint/" + stopPointId + "/Arrivals/",
+	}
 
 	var res []LondonArrival
 
-	err := api.getCall(url, &res)
+	err := api.getCall(trUrl.String(), &res)
 
 	if err != nil {
 		return nil, err

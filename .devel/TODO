@@ -22,14 +22,14 @@
 - [x] refactor go code to have the remote calls injected
 - [ ] write tests for remote
 - [ ] write API tests with mock remote injected
-- [ ] URL get parameters with framework, not string operations
+- [x] URL get parameters with framework, not string operations
+- [ ] better parsing the stopId from the URL
 - [x] order arrivals by time
 - [ ] parse and serialize datetime
-- [ ] better parsing the stopId from the URL
 - [ ] choose an IDL
 - [ ] write IDL for the API
 - [ ] add an other API
-- [ ] fix deprecated proxy events
+- [-] fix deprecated proxy events
 - [ ] to readme: secret management
 - [ ] to readme: localication + #noloc
 - [ ] alert popup solution in javascript
