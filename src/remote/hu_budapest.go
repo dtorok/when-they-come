@@ -5,7 +5,6 @@ import (
 	"log"
 	"io/ioutil"
 	"strings"
-	"fmt"
 	"time"
 	"net/url"
 )
@@ -60,28 +59,6 @@ type BudapestArrivalResponse struct {
 	Data BudapestArrivalData
 }
 
-func (api BudapestTransportAPI) getCall(url string, res interface{}) error {
-	fmt.Println(url)
-	resp, err := api.client.Get(url)
-	if err != nil {
-		return err
-	} else {
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		err = json.Unmarshal(body, &res)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 func NewBudapestTransportAPI(client HttpClient) BudapestTransportAPI {
 	data, err := ioutil.ReadFile("src/remote/hu_budapest_stops.json")
 	if err != nil {
@@ -99,15 +76,20 @@ func NewBudapestTransportAPI(client HttpClient) BudapestTransportAPI {
 }
 
 func (api BudapestTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
+	const MAX_NUM = 200
+
 	latFrom := lat - 0.01
 	latTo := lat + 0.01
 	lonFrom := lon - 0.01
 	lonTo := lon + 0.01
 
-	var result []Stop = make([]Stop, 200)
+	var result []Stop = make([]Stop, MAX_NUM)
 	var cnt = 0
 	for _, stop := range api.stops {
-		if stop.Lat > latFrom && stop.Lat < latTo && stop.Lon > lonFrom && stop.Lon < lonTo {
+		if cnt >= MAX_NUM {
+			break
+		}
+		if inBoundingBox(stop.Lat, stop.Lon, latFrom, lonFrom, latTo, lonTo) {
 			var id = stop.Id
 			if strings.Index(id, "F") == 0 {
 				id = id[1:]
@@ -144,7 +126,7 @@ func (api BudapestTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, e
 	var res BudapestArrivalResponse
 	var now = time.Now().Unix()
 
-	err := api.getCall(trUrl.String(), &res)
+	err := httpJsonGET(api.client, trUrl.String(), &res)
 	if err != nil {
 		return nil, err
 	}

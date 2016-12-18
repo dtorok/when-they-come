@@ -24,15 +24,14 @@
 - [x] move healthcheck under api
 - [x] write API tests with mock remote injected
 - [x] write tests for remote
-- [ ] write integration test for the whole flow
 - [x] URL get parameters with framework, not string operations
 - [x] better parsing the stopId from the URL
 - [x] order arrivals by time
 - [ ] add logging
-- [ ] add parallel combiner
-- [ ] add byCoord combiner
-- [ ] parse and serialize datetime
-- [ ] move getCall to a common place
+- [-] add parallel combiner
+- [x] add byCoord combiner
+- [-] parse and serialize datetime
+- [x] move getCall to a common place
 - [ ] choose an IDL
 - [ ] write IDL for the API
 - [-] fix deprecated proxy events

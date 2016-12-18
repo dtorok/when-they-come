@@ -3,8 +3,6 @@ package remote
 import (
 	"fmt"
 	"net/url"
-	"io/ioutil"
-	"encoding/json"
 )
 
 const londonBaseScheme = "https"
@@ -40,28 +38,6 @@ func NewLondonTransportAPI(client HttpClient) LondonTransportAPI {
 	return LondonTransportAPI{client}
 }
 
-func (api LondonTransportAPI) getCall(url string, res interface{}) error {
-	fmt.Println(url)
-	resp, err := api.client.Get(url)
-	if err != nil {
-		return err
-	} else {
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-
-		err = json.Unmarshal(body, &res)
-		if err != nil {
-			return err
-		}
-
-		return nil
-	}
-}
-
 func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, error) {
 	query := url.Values{}
 	query.Set("lat", fmt.Sprintf("%f", lat))
@@ -78,7 +54,7 @@ func (api LondonTransportAPI) ListStopPointsAround(lat, lon float64) ([]Stop, er
 
 	var res LondonStopPointResult
 
-	err := api.getCall(trUrl.String(), &res)
+	err := httpJsonGET(api.client, trUrl.String(), &res)
 
 	if err != nil {
 		return nil, err
@@ -108,7 +84,7 @@ func (api LondonTransportAPI) ListArrivalsOf(stopPointId string) ([]Arrival, err
 
 	var res []LondonArrival
 
-	err := api.getCall(trUrl.String(), &res)
+	err := httpJsonGET(api.client, trUrl.String(), &res)
 
 	if err != nil {
 		return nil, err
