@@ -66,7 +66,7 @@
         })
     }
     function getVehicles(stopId, callback) {
-        $.ajax("/api/v1/stops/" + stopId + "/", {
+        $.ajax("/api/v1/stops/" + stopId + "/arrivals/", {
             success: function(data, status) {
                 callback(data)
             },
