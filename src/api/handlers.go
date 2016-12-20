@@ -18,5 +18,4 @@ func AddHandlers() {
 
 	backend := NewBackendApi(&trApi)
 	backend.AddHandlers()
-
 }
