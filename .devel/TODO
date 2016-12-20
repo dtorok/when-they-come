@@ -32,13 +32,13 @@
 - [x] add byCoord combiner
 - [-] parse and serialize datetime
 - [x] move getCall to a common place
-- [ ] choose an IDL
-- [ ] write IDL for the API
+- [x] choose an IDL
+- [-] write IDL for the API
 - [-] fix deprecated proxy events
-- [ ] to readme: secret management
-- [ ] to readme: localication + #noloc
+- [x] to readme: secret management
+- [x] to readme: localication + #noloc
 - [-] alert popup solution in javascript
-- [ ] make repository accessible
+- [x] make repository accessible
 
 
 ## Own API
